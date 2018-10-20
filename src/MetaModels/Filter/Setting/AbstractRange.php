@@ -361,11 +361,9 @@ abstract class AbstractRange extends Simple
             */
             
             $beginOfDay = ( strtotime(date("d.m.Y", $this->formatValue($value[0]))) );
-			$endOfDay = ( strtotime(date("d.m.Y", $this->formatValue($value[1])) . ' 23:59:59' )  );
-			
-			$lowerMatches = array_diff($attribute->filterLessThan($beginOfDay, false), $attribute2->filterLessThan($endOfDay, false));
-			
-			$upperMatches = array_diff($attribute2->filterGreaterThan($beginOfDay, false), $attribute->filterGreaterThan($endOfDay, false));
+	    $endOfDay = ( strtotime(date("d.m.Y", $this->formatValue($value[1])) . ' 23:59:59' )  );
+	    $lowerMatches = array_diff($attribute->filterLessThan($beginOfDay, false), $attribute2->filterLessThan($endOfDay, false));
+	    $upperMatches = array_diff($attribute2->filterGreaterThan($beginOfDay, false), $attribute->filterGreaterThan($endOfDay, false));
         }
         $result = array_unique(array_merge($upperMatches, $lowerMatches));
 
