@@ -337,22 +337,36 @@ abstract class AbstractRange extends Simple
             return;
         }
 
-        $filterOne = $this->getMetaModel()->getEmptyFilter();
-        $filterTwo = $this->getMetaModel()->getEmptyFilter();
-        $moreEqual = (bool) $this->get('moreequal');
-        $lessEqual = (bool) $this->get('lessequal');
+        if (false)
+        {
+            $filterOne = $this->getMetaModel()->getEmptyFilter();
+            $filterTwo = $this->getMetaModel()->getEmptyFilter();
+            $moreEqual = (bool) $this->get('moreequal');
+            $lessEqual = (bool) $this->get('lessequal');
 
-        $filterOne
-            ->addFilterRule(new LessThan($attribute, $this->formatValue($value[0]), $moreEqual))
-            ->addFilterRule(new GreaterThan($attribute2, $this->formatValue($value[0]), $lessEqual));
+            $filterOne
+                ->addFilterRule(new LessThan($attribute, $this->formatValue($value[0]), $moreEqual))
+                ->addFilterRule(new GreaterThan($attribute2, $this->formatValue($value[0]), $lessEqual));
 
-        $filterTwo
-            ->addFilterRule(new LessThan($attribute, $this->formatValue($value[1]), $moreEqual))
-            ->addFilterRule(new GreaterThan($attribute2, $this->formatValue($value[1]), $lessEqual));
+            $filterTwo
+                ->addFilterRule(new LessThan($attribute, $this->formatValue($value[1]), $moreEqual))
+                ->addFilterRule(new GreaterThan($attribute2, $this->formatValue($value[1]), $lessEqual));
 
-        $upperMatches = $filterOne->getMatchingIds();
-        $lowerMatches = $filterTwo->getMatchingIds();
-
+            $upperMatches = $filterOne->getMatchingIds();
+            $lowerMatches = $filterTwo->getMatchingIds();
+        } else {
+            
+            /*
+            Solves: https://github.com/MetaModels/filter_range/issues/8
+            */
+            
+            $beginOfDay = ( strtotime(date("d.m.Y", $this->formatValue($value[0]))) );
+			$endOfDay = ( strtotime(date("d.m.Y", $this->formatValue($value[1])) . ' 23:59:59' )  );
+			
+			$lowerMatches = array_diff($attribute->filterLessThan($beginOfDay, false), $attribute2->filterLessThan($endOfDay, false));
+			
+			$upperMatches = array_diff($attribute2->filterGreaterThan($beginOfDay, false), $attribute->filterGreaterThan($endOfDay, false));
+        }
         $result = array_unique(array_merge($upperMatches, $lowerMatches));
 
         $objFilter->addFilterRule(new StaticIdList($result));
