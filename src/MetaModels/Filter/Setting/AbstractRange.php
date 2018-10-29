@@ -360,10 +360,16 @@ abstract class AbstractRange extends Simple
             Solves: https://github.com/MetaModels/filter_range/issues/8
             */
             
-            $beginOfDay = ( strtotime(date("d.m.Y", $this->formatValue($value[0]))) );
-	    $endOfDay = ( strtotime(date("d.m.Y", $this->formatValue($value[1])) . ' 23:59:59' )  );
-	    $lowerMatches = array_diff($attribute->filterLessThan($beginOfDay, false), $attribute2->filterLessThan($endOfDay, false));
-	    $upperMatches = array_diff($attribute2->filterGreaterThan($beginOfDay, false), $attribute->filterGreaterThan($endOfDay, false));
+		$att0 = $this->formatValue($value[0])?$this->formatValue($value[0]):time();
+		$att1 = $this->formatValue($value[1])?$this->formatValue($value[1]):time();
+			
+		$beginOfDay = ( strtotime(date("d.m.Y", $att0)));
+		$endOfDay = ( strtotime(date("d.m.Y", $att1) . ' 23:59:59' ));
+			
+		$lowerMatches = array_diff($attribute->filterLessThan($beginOfDay, false), $attribute2->filterLessThan($endOfDay, false));
+			
+		$upperMatches = array_diff($attribute2->filterGreaterThan($beginOfDay, false), $attribute->filterGreaterThan($endOfDay, false));
+            
         }
         $result = array_unique(array_merge($upperMatches, $lowerMatches));
 
